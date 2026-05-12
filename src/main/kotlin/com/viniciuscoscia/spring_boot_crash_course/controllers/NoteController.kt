@@ -33,7 +33,8 @@ class NoteController(
         val title: String,
         val content: String,
         val color: Long,
-        val createdAt: String
+        val createdAt: String,
+        val ownerId: String
     )
 
     @PostMapping
@@ -45,14 +46,14 @@ class NoteController(
                 content = body.content,
                 color = body.color,
                 createdAt = Clock.System.now(),
-                ownerId = ObjectId()
+                ownerId = ObjectId(body.ownerId)
             )
         )
         return note.toResponse()
     }
 
     @GetMapping
-    fun bindByOwnerId(
+    fun findByOwnerId(
         @RequestParam(required = true) ownerId: String
     ): List<NoteResponse> {
         return repository.findByOwnerId(ObjectId(ownerId)).map {
@@ -67,6 +68,7 @@ private fun Note.toResponse(): NoteController.NoteResponse {
         title = this.title,
         content = this.content,
         color = this.color,
-        createdAt = this.createdAt.toString()
+        createdAt = this.createdAt.toString(),
+        ownerId = this.ownerId.toHexString()
     )
 }
